@@ -1,0 +1,68 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags: ['v17.*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF_NAME" =~ ^v17\.[0-9]+\.[0-9]+$ ]] || exit 1
+          git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main ||
+            git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/v17/main
+          echo "PACKAGE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build backoffice
+        working-directory: src/Umbraco.Community.LogLevels/Client
+        run: npm ci && npm test && npm run build
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Test
+        run: dotnet test Umbraco.Community.LogLevels.slnx --configuration Release
+      - name: Pack
+        run: dotnet pack src/Umbraco.Community.LogLevels/Umbraco.Community.LogLevels.csproj --configuration Release --output artifacts -p:PackageVersion="$PACKAGE_VERSION"
+      - name: Validate package identity and contents
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, xml.etree.ElementTree as ET, zipfile
+          version = os.environ['PACKAGE_VERSION']
+          package = pathlib.Path('artifacts') / f'Umbraco.Community.LogLevels.{version}.nupkg'
+          with zipfile.ZipFile(package) as archive:
+              names = archive.namelist()
+              nuspec = [name for name in names if name.endswith('.nuspec')]
+              assert len(nuspec) == 1
+              metadata = ET.fromstring(archive.read(nuspec[0])).find('{*}metadata')
+              assert metadata.findtext('{*}id') == 'Umbraco.Community.LogLevels'
+              assert metadata.findtext('{*}version') == version
+              deps = [d for d in metadata.findall('.//{*}dependency') if d.get('id', '').startswith('Umbraco.Cms.')]
+              assert deps and all(d.get('version', '').replace(' ', '') == '[17.0.0,18.0.0)' for d in deps)
+              assert {'README.md', 'icon.png', 'THIRD-PARTY-NOTICES.md'} <= set(names)
+              assert any(name.endswith('umbraco-package.json') for name in names)
+              assert any(name.endswith('.js') and 'staticwebassets/' in name for name in names)
+          print(f'Validated {package}')
+          PY
+      - name: Log in to NuGet with GitHub OIDC
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Publish
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/Umbraco.Community.LogLevels.${PACKAGE_VERSION}.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate

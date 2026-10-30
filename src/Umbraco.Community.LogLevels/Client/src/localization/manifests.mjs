@@ -1,0 +1,58 @@
+export const localizations = [
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.en",
+    name: "LogLevels English",
+    meta: { culture: "en" },
+    js: () => import("./en.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.de",
+    name: "LogLevels German",
+    meta: { culture: "de" },
+    js: () => import("./de.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.fr",
+    name: "LogLevels French",
+    meta: { culture: "fr" },
+    js: () => import("./fr.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.nl",
+    name: "LogLevels Dutch",
+    meta: { culture: "nl" },
+    js: () => import("./nl.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.da",
+    name: "LogLevels Danish",
+    meta: { culture: "da" },
+    js: () => import("./da.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.sv",
+    name: "LogLevels Swedish",
+    meta: { culture: "sv" },
+    js: () => import("./sv.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.it",
+    name: "LogLevels Italian",
+    meta: { culture: "it" },
+    js: () => import("./it.mjs"),
+  },
+  {
+    type: "localization",
+    alias: "LogLevels.Localization.es",
+    name: "LogLevels Spanish",
+    meta: { culture: "es" },
+    js: () => import("./es.mjs"),
+  },
+];

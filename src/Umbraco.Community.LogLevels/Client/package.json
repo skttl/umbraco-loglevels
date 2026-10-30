@@ -1,0 +1,17 @@
+{
+  "name": "umbraco-community-loglevels",
+  "version": "17.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-client": "openapi-ts",
+    "build": "tsc --noEmit && vite build --configLoader runner",
+    "test": "node --test src/*.test.mjs"
+  },
+  "devDependencies": {
+    "@umbraco-cms/backoffice": "17.0.0",
+    "@hey-api/openapi-ts": "0.85.0",
+    "typescript": "5.9.3",
+    "vite": "6.4.5"
+  }
+}

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/LogLevels</StaticWebAssetBasePath>
+    <PackageId>Umbraco.Community.LogLevels</PackageId>
+    <Version>17.0.0</Version>
+    <Authors>skttl</Authors>
+    <Description>Change Serilog log levels and namespace overrides at runtime from the Umbraco Log Viewer.</Description>
+    <PackageTags>umbraco;umbraco-marketplace;serilog;logging;loglevels</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/skttl/umbraco-loglevels</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/skttl/umbraco-loglevels</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.0.0,18.0.0)" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../docs/nuget-readme.md" Pack="true" PackagePath="README.md" />
+    <None Include="../../icon.png" Pack="true" PackagePath="icon.png" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="THIRD-PARTY-NOTICES.md" />
+    <None Remove="Client/**" />
+    <Content Remove="Client/**" />
+    <Compile Remove="Client/**" />
+    <EmbeddedResource Remove="Client/**" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Umbraco.Community.LogLevels/Umbraco.Community.LogLevels.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Umbraco.Community.LogLevels.TestSite/Umbraco.Community.LogLevels.TestSite.csproj" />
+    <Project Path="tests/Umbraco.Community.LogLevels.Tests/Umbraco.Community.LogLevels.Tests.csproj" />
+  </Folder>
+</Solution>

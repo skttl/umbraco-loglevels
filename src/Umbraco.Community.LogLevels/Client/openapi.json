@@ -1,0 +1,228 @@
+{
+  "info": {
+    "version": "17.0.0",
+    "title": "LogLevels API"
+  },
+  "paths": {
+    "/umbraco/loglevels/api/v1/settings": {
+      "put": {
+        "operationId": "updateSettings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "409": {
+            "description": "Revision conflict"
+          },
+          "403": {
+            "description": "Administrators only"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            },
+            "description": "Log levels"
+          }
+        }
+      },
+      "delete": {
+        "responses": {
+          "409": {
+            "description": "Revision conflict"
+          },
+          "403": {
+            "description": "Administrators only"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            },
+            "description": "Log levels"
+          }
+        },
+        "operationId": "resetSettings",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "required": true,
+            "name": "revision"
+          }
+        ]
+      },
+      "get": {
+        "responses": {
+          "409": {
+            "description": "Revision conflict"
+          },
+          "403": {
+            "description": "Administrators only"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            },
+            "description": "Log levels"
+          }
+        },
+        "operationId": "getSettings"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "openapi": "3.0.3",
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "UpdateSettings": {
+        "type": "object",
+        "required": [
+          "defaultLevel",
+          "overrides",
+          "revision"
+        ],
+        "properties": {
+          "overrides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "source",
+                "level"
+              ],
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "Verbose",
+                    "Debug",
+                    "Information",
+                    "Warning",
+                    "Error",
+                    "Fatal"
+                  ]
+                }
+              }
+            }
+          },
+          "defaultLevel": {
+            "type": "string",
+            "enum": [
+              "Verbose",
+              "Debug",
+              "Information",
+              "Warning",
+              "Error",
+              "Fatal"
+            ]
+          },
+          "revision": {
+            "type": "integer"
+          }
+        }
+      },
+      "Policy": {
+        "type": "object",
+        "required": [
+          "defaultLevel",
+          "overrides"
+        ],
+        "properties": {
+          "defaultLevel": {
+            "type": "string",
+            "enum": [
+              "Verbose",
+              "Debug",
+              "Information",
+              "Warning",
+              "Error",
+              "Fatal"
+            ]
+          },
+          "overrides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "source",
+                "level"
+              ],
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "Verbose",
+                    "Debug",
+                    "Information",
+                    "Warning",
+                    "Error",
+                    "Fatal"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Settings": {
+        "type": "object",
+        "required": [
+          "current",
+          "startup",
+          "revision",
+          "serverName"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer"
+          },
+          "serverName": {
+            "type": "string"
+          },
+          "current": {
+            "$ref": "#/components/schemas/Policy"
+          },
+          "startup": {
+            "$ref": "#/components/schemas/Policy"
+          }
+        }
+      }
+    }
+  }
+}

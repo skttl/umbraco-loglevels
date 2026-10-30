@@ -1,0 +1,19 @@
+# Umbraco runtime state and generated configuration
+/umbraco/
+/wwwroot/media/
+/appsettings-schema.json
+/appsettings-schema.*.json
+/appsettings.*.Schema.json
+/umbraco-package-schema.json
+# Clean restores its views and assets on build.
+/Views/*
+!/Views/_ViewImports.cshtml
+!/Views/Partials/
+/Views/Partials/*
+!/Views/Partials/blockgrid/
+!/Views/Partials/blocklist/
+/Views/Partials/blocklist/*
+!/Views/Partials/blocklist/default.cshtml
+!/Views/Partials/singleblock/
+/wwwroot/css/
+/wwwroot/assets/

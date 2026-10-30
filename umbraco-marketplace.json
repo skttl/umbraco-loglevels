@@ -1,0 +1,18 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "Title": "LogLevels",
+  "Description": "Change Serilog log levels and namespace overrides at runtime from the Umbraco Log Viewer.",
+  "Category": "Developer Tools",
+  "LicenseTypes": ["Free"],
+  "PackageType": "Package",
+  "DocumentationUrl": "https://github.com/skttl/umbraco-loglevels/blob/main/docs/nuget-readme.md",
+  "IssueTrackerUrl": "https://github.com/skttl/umbraco-loglevels/issues",
+  "Screenshots": [
+    {
+      "ImageUrl": "https://raw.githubusercontent.com/skttl/umbraco-loglevels/main/docs/images/loglevels.png",
+      "Caption": "Log levels and namespace overrides inside the Umbraco Log Viewer"
+    }
+  ],
+  "Tags": ["logging", "loglevels", "serilog", "debugging"],
+  "VersionDependencyMode": "SemVer"
+}
