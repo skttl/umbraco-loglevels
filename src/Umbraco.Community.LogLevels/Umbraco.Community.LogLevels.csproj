@@ -7,7 +7,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>App_Plugins/LogLevels</StaticWebAssetBasePath>
     <PackageId>Umbraco.Community.LogLevels</PackageId>
-    <Version>17.0.0</Version>
+    <Version>18.0.0</Version>
     <Authors>skttl</Authors>
     <Description>Change Serilog log levels and namespace overrides at runtime from the Umbraco Log Viewer.</Description>
     <PackageTags>umbraco;umbraco-marketplace;serilog;logging;loglevels</PackageTags>
@@ -22,7 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.0.0,18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[18.0.0,19.0.0)" />
   </ItemGroup>
   <ItemGroup>
     <None Include="../../docs/nuget-readme.md" Pack="true" PackagePath="README.md" />

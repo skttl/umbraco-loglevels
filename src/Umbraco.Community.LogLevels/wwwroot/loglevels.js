@@ -59,7 +59,7 @@ const a = [
   type: "workspaceView",
   alias: "LogLevels.WorkspaceView",
   name: "LogLevels workspace view",
-  element: () => import("./loglevels.element-Dmh63405.js"),
+  element: () => import("./loglevels.element-CDkTDCPY.js"),
   weight: 100,
   meta: {
     label: "#logLevels_title",

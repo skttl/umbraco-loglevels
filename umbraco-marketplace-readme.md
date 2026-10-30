@@ -10,14 +10,14 @@ The interface follows your backoffice language. English, German, French, Dutch, 
 
 ## Installation
 
-Install **Umbraco.Community.LogLevels 17.0.0**; the package registers itself automatically through an `IComposer`. Standard Umbraco startup needs no `Program.cs` changes. See [the setup guide](docs/nuget-readme.md) for the complete example. Installation requires one restart; applying log-level changes afterwards does not.
+Install **Umbraco.Community.LogLevels 18.0.0**; the package registers itself automatically through an `IComposer`. Standard Umbraco startup needs no `Program.cs` changes. See [the setup guide](docs/nuget-readme.md) for the complete example. Installation requires one restart; applying log-level changes afterwards does not.
 
 ## Scope
 
-- Supports Umbraco 17 and requires an administrator account.
+- Supports Umbraco 18 and requires an administrator account.
 - Runtime changes apply to the current server process only and disappear on restart.
 - Configuration files are never rewritten.
 - Existing sink restrictions and other Serilog filters still apply.
 - Detailed messages may be constructed before filtering, adding CPU overhead. Review this before using on high-volume sites.
 
-The Umbraco 18 version will follow separately.
+For Umbraco 17, use the 17.x package from the `v17/main` branch.

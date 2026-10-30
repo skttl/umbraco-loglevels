@@ -10,9 +10,9 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms" Version="17.7.1" />
-    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.7.1" />
-    <PackageReference Include="Clean" Version="7.0.7" />
+    <PackageReference Include="Umbraco.Cms" Version="18.0.2" />
+    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="18.0.2" />
+    <PackageReference Include="Clean" Version="8.0.1" />
     <ProjectReference Include="../../src/Umbraco.Community.LogLevels/Umbraco.Community.LogLevels.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) Or $([MSBuild]::IsOSPlatform('Linux'))">

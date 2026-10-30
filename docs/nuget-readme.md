@@ -4,10 +4,10 @@ Change Serilog log levels and namespace overrides at runtime from the Umbraco Lo
 
 ## Installation
 
-Requires Umbraco 17 and .NET 10. Install the package:
+Requires Umbraco 18 and .NET 10. Install the package:
 
 ```sh
-dotnet add package Umbraco.Community.LogLevels --version 17.0.0
+dotnet add package Umbraco.Community.LogLevels --version 18.0.0
 ```
 
 The package registers itself through `LogLevelsComposer`. Standard Umbraco startup already calls `.AddComposers()`, so no changes to `Program.cs` are needed. Restart once after installation. Subsequent changes from backoffice take effect without a restart.
@@ -66,4 +66,4 @@ The standard Log Viewer Overview card reports the effective default level. Custo
 
 ## Versions
 
-Package major versions follow Umbraco majors. `17.0.0` targets Umbraco `[17.0.0,18.0.0)`. The Umbraco 18 package is a separate follow-up, not part of this release.
+Package major versions follow Umbraco majors. `18.0.0` targets Umbraco `[18.0.0,19.0.0)`. The Umbraco 17 package is maintained on the `v17/main` branch.

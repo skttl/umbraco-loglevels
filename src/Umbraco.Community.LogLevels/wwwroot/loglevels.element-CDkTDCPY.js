@@ -1,120 +1,111 @@
-import { LitElement as ee, html as m, nothing as z, css as te, state as S, customElement as re } from "@umbraco-cms/backoffice/external/lit";
-import { UmbElementMixin as se } from "@umbraco-cms/backoffice/element-api";
-import { UMB_AUTH_CONTEXT as ie } from "@umbraco-cms/backoffice/auth";
-import { UmbTextStyles as ae } from "@umbraco-cms/backoffice/style";
-const oe = {
-  bodySerializer: (e) => JSON.stringify(
-    e,
-    (t, r) => typeof r == "bigint" ? r.toString() : r
-  )
-}, ne = ({
+import { LitElement as te, html as y, nothing as j, css as re, state as k, customElement as se } from "@umbraco-cms/backoffice/external/lit";
+import { UmbElementMixin as ie } from "@umbraco-cms/backoffice/element-api";
+import { UMB_AUTH_CONTEXT as ae } from "@umbraco-cms/backoffice/auth";
+import { UmbTextStyles as oe } from "@umbraco-cms/backoffice/style";
+const ne = {
+  bodySerializer: (e) => JSON.stringify(e, (t, r) => typeof r == "bigint" ? r.toString() : r)
+};
+function le({
   onRequest: e,
   onSseError: t,
   onSseEvent: r,
   responseTransformer: s,
   responseValidator: i,
   sseDefaultRetryDelay: l,
-  sseMaxRetryAttempts: n,
+  sseMaxRetryAttempts: a,
   sseMaxRetryDelay: o,
-  sseSleepFn: c,
-  url: d,
-  ...a
-}) => {
-  let h;
-  const C = c ?? ((u) => new Promise((p) => setTimeout(p, u)));
+  sseSleepFn: n,
+  url: v,
+  ...u
+}) {
+  let c;
+  const w = n ?? ((d) => new Promise((f) => setTimeout(f, d)));
   return { stream: async function* () {
-    let u = l ?? 3e3, p = 0;
-    const k = a.signal ?? new AbortController().signal;
-    for (; !k.aborted; ) {
-      p++;
-      const q = a.headers instanceof Headers ? a.headers : new Headers(a.headers);
-      h !== void 0 && q.set("Last-Event-ID", h);
+    let d = l ?? 3e3, f = 0;
+    const g = u.signal ?? new AbortController().signal;
+    for (; !g.aborted; ) {
+      f++;
+      const q = u.headers instanceof Headers ? u.headers : new Headers(u.headers);
+      c !== void 0 && q.set("Last-Event-ID", c);
       try {
-        const j = {
+        const E = {
           redirect: "follow",
-          ...a,
-          body: a.serializedBody,
+          ...u,
+          body: u.serializedBody,
           headers: q,
-          signal: k
+          signal: g
         };
-        let g = new Request(d, j);
-        e && (g = await e(d, j));
-        const b = await (a.fetch ?? globalThis.fetch)(g);
-        if (!b.ok)
-          throw new Error(
-            `SSE failed: ${b.status} ${b.statusText}`
-          );
-        if (!b.body) throw new Error("No body in SSE response");
-        const $ = b.body.pipeThrough(new TextDecoderStream()).getReader();
-        let R = "";
-        const I = () => {
+        let O = new Request(v, E);
+        e && (O = await e(v, E));
+        const p = await (u.fetch ?? globalThis.fetch)(O);
+        if (!p.ok) throw new Error(`SSE failed: ${p.status} ${p.statusText}`);
+        if (!p.body) throw new Error("No body in SSE response");
+        const x = p.body.pipeThrough(new TextDecoderStream()).getReader();
+        let m = "";
+        const D = () => {
           try {
-            $.cancel();
+            x.cancel();
           } catch {
           }
         };
-        k.addEventListener("abort", I);
+        g.addEventListener("abort", D);
         try {
           for (; ; ) {
-            const { done: K, value: X } = await $.read();
-            if (K) break;
-            R += X;
-            const U = R.split(`
+            const { done: X, value: Y } = await x.read();
+            if (X) break;
+            m += Y, m = m.replace(/\r\n?/g, `
+`);
+            const I = m.split(`
 
 `);
-            R = U.pop() ?? "";
-            for (const Y of U) {
-              const Z = Y.split(`
-`), L = [];
-              let P;
-              for (const v of Z)
-                if (v.startsWith("data:"))
-                  L.push(v.replace(/^data:\s*/, ""));
-                else if (v.startsWith("event:"))
-                  P = v.replace(/^event:\s*/, "");
-                else if (v.startsWith("id:"))
-                  h = v.replace(/^id:\s*/, "");
-                else if (v.startsWith("retry:")) {
-                  const B = Number.parseInt(
-                    v.replace(/^retry:\s*/, ""),
-                    10
-                  );
-                  Number.isNaN(B) || (u = B);
+            m = I.pop() ?? "";
+            for (const Z of I) {
+              const ee = Z.split(`
+`), R = [];
+              let N;
+              for (const S of ee)
+                if (S.startsWith("data:"))
+                  R.push(S.replace(/^data:\s*/, ""));
+                else if (S.startsWith("event:"))
+                  N = S.replace(/^event:\s*/, "");
+                else if (S.startsWith("id:"))
+                  c = S.replace(/^id:\s*/, "");
+                else if (S.startsWith("retry:")) {
+                  const B = Number.parseInt(S.replace(/^retry:\s*/, ""), 10);
+                  Number.isNaN(B) || (d = B);
                 }
-              let E, N = !1;
-              if (L.length) {
-                const v = L.join(`
+              let C, P = !1;
+              if (R.length) {
+                const S = R.join(`
 `);
                 try {
-                  E = JSON.parse(v), N = !0;
+                  C = JSON.parse(S), P = !0;
                 } catch {
-                  E = v;
+                  C = S;
                 }
               }
-              N && (i && await i(E), s && (E = await s(E))), r == null || r({
-                data: E,
-                event: P,
-                id: h,
-                retry: u
-              }), L.length && (yield E);
+              P && (i && await i(C), s && (C = await s(C))), r == null || r({
+                data: C,
+                event: N,
+                id: c,
+                retry: d
+              }), R.length && (yield C);
             }
           }
         } finally {
-          k.removeEventListener("abort", I), $.releaseLock();
+          g.removeEventListener("abort", D), x.releaseLock();
         }
         break;
-      } catch (j) {
-        if (t == null || t(j), n !== void 0 && p >= n)
+      } catch (E) {
+        if (t == null || t(E), a !== void 0 && f >= a)
           break;
-        const g = Math.min(
-          u * 2 ** (p - 1),
-          o ?? 3e4
-        );
-        await C(g);
+        const O = Math.min(d * 2 ** (f - 1), o ?? 3e4);
+        await w(O);
       }
     }
   }() };
-}, ce = (e) => {
+}
+const ce = (e) => {
   switch (e) {
     case "label":
       return ".";
@@ -125,7 +116,7 @@ const oe = {
     default:
       return "&";
   }
-}, le = (e) => {
+}, ue = (e) => {
   switch (e) {
     case "form":
       return ",";
@@ -136,7 +127,7 @@ const oe = {
     default:
       return ",";
   }
-}, ue = (e) => {
+}, de = (e) => {
   switch (e) {
     case "label":
       return ".";
@@ -147,7 +138,7 @@ const oe = {
     default:
       return "&";
   }
-}, F = ({
+}, J = ({
   allowReserved: e,
   explode: t,
   name: r,
@@ -155,7 +146,7 @@ const oe = {
   value: i
 }) => {
   if (!t) {
-    const o = (e ? i : i.map((c) => encodeURIComponent(c))).join(le(s));
+    const o = (e ? i : i.map((n) => encodeURIComponent(n))).join(ue(s));
     switch (s) {
       case "label":
         return `.${o}`;
@@ -167,13 +158,13 @@ const oe = {
         return `${r}=${o}`;
     }
   }
-  const l = ce(s), n = i.map((o) => s === "label" || s === "simple" ? e ? o : encodeURIComponent(o) : T({
+  const l = ce(s), a = i.map((o) => s === "label" || s === "simple" ? e ? o : encodeURIComponent(o) : L({
     allowReserved: e,
     name: r,
     value: o
   })).join(l);
-  return s === "label" || s === "matrix" ? l + n : n;
-}, T = ({
+  return s === "label" || s === "matrix" ? l + a : a;
+}, L = ({
   allowReserved: e,
   name: t,
   value: r
@@ -185,7 +176,7 @@ const oe = {
       "Deeply-nested arrays/objects aren’t supported. Provide your own `querySerializer()` to handle these."
     );
   return `${t}=${e ? r : encodeURIComponent(r)}`;
-}, J = ({
+}, M = ({
   allowReserved: e,
   explode: t,
   name: r,
@@ -196,59 +187,52 @@ const oe = {
   if (i instanceof Date)
     return l ? i.toISOString() : `${r}=${i.toISOString()}`;
   if (s !== "deepObject" && !t) {
-    let c = [];
-    Object.entries(i).forEach(([a, h]) => {
-      c = [
-        ...c,
-        a,
-        e ? h : encodeURIComponent(h)
-      ];
+    let n = [];
+    Object.entries(i).forEach(([u, c]) => {
+      n = [...n, u, e ? c : encodeURIComponent(c)];
     });
-    const d = c.join(",");
+    const v = n.join(",");
     switch (s) {
       case "form":
-        return `${r}=${d}`;
+        return `${r}=${v}`;
       case "label":
-        return `.${d}`;
+        return `.${v}`;
       case "matrix":
-        return `;${r}=${d}`;
+        return `;${r}=${v}`;
       default:
-        return d;
+        return v;
     }
   }
-  const n = ue(s), o = Object.entries(i).map(
-    ([c, d]) => T({
+  const a = de(s), o = Object.entries(i).map(
+    ([n, v]) => L({
       allowReserved: e,
-      name: s === "deepObject" ? `${r}[${c}]` : c,
-      value: d
+      name: s === "deepObject" ? `${r}[${n}]` : n,
+      value: v
     })
-  ).join(n);
-  return s === "label" || s === "matrix" ? n + o : o;
-}, de = /\{[^{}]+\}/g, he = ({ path: e, url: t }) => {
+  ).join(a);
+  return s === "label" || s === "matrix" ? a + o : o;
+}, he = /\{[^{}]+\}/g, fe = ({ path: e, url: t }) => {
   let r = t;
-  const s = t.match(de);
+  const s = t.match(he);
   if (s)
     for (const i of s) {
-      let l = !1, n = i.substring(1, i.length - 1), o = "simple";
-      n.endsWith("*") && (l = !0, n = n.substring(0, n.length - 1)), n.startsWith(".") ? (n = n.substring(1), o = "label") : n.startsWith(";") && (n = n.substring(1), o = "matrix");
-      const c = e[n];
-      if (c == null)
+      let l = !1, a = i.substring(1, i.length - 1), o = "simple";
+      a.endsWith("*") && (l = !0, a = a.substring(0, a.length - 1)), a.startsWith(".") ? (a = a.substring(1), o = "label") : a.startsWith(";") && (a = a.substring(1), o = "matrix");
+      const n = e[a];
+      if (n == null)
         continue;
-      if (Array.isArray(c)) {
-        r = r.replace(
-          i,
-          F({ explode: l, name: n, style: o, value: c })
-        );
+      if (Array.isArray(n)) {
+        r = r.replace(i, J({ explode: l, name: a, style: o, value: n }));
         continue;
       }
-      if (typeof c == "object") {
+      if (typeof n == "object") {
         r = r.replace(
           i,
-          J({
+          M({
             explode: l,
-            name: n,
+            name: a,
             style: o,
-            value: c,
+            value: n,
             valueOnly: !0
           })
         );
@@ -257,20 +241,20 @@ const oe = {
       if (o === "matrix") {
         r = r.replace(
           i,
-          `;${T({
-            name: n,
-            value: c
+          `;${L({
+            name: a,
+            value: n
           })}`
         );
         continue;
       }
-      const d = encodeURIComponent(
-        o === "label" ? `.${c}` : c
+      const v = encodeURIComponent(
+        o === "label" ? `.${n}` : n
       );
-      r = r.replace(i, d);
+      r = r.replace(i, v);
     }
   return r;
-}, fe = ({
+}, pe = ({
   baseUrl: e,
   path: t,
   query: r,
@@ -278,12 +262,12 @@ const oe = {
   url: i
 }) => {
   const l = i.startsWith("/") ? i : `/${i}`;
-  let n = (e ?? "") + l;
-  t && (n = he({ path: t, url: n }));
+  let a = (e ?? "") + l;
+  t && (a = fe({ path: t, url: a }));
   let o = r ? s(r) : "";
-  return o.startsWith("?") && (o = o.substring(1)), o && (n += `?${o}`), n;
+  return o.startsWith("?") && (o = o.substring(1)), o && (a += `?${o}`), a;
 };
-function pe(e) {
+function W(e) {
   const t = e.body !== void 0;
   if (t && e.bodySerializer)
     return "serializedBody" in e ? e.serializedBody !== void 0 && e.serializedBody !== "" ? e.serializedBody : null : e.body !== "" ? e.body : null;
@@ -294,46 +278,47 @@ const me = async (e, t) => {
   const r = typeof t == "function" ? await t(e) : t;
   if (r)
     return e.scheme === "bearer" ? `Bearer ${r}` : e.scheme === "basic" ? `Basic ${btoa(r)}` : r;
-}, M = ({
-  allowReserved: e,
-  array: t,
-  object: r
-} = {}) => (i) => {
-  const l = [];
-  if (i && typeof i == "object")
-    for (const n in i) {
-      const o = i[n];
-      if (o != null)
-        if (Array.isArray(o)) {
-          const c = F({
-            allowReserved: e,
-            explode: !0,
-            name: n,
-            style: "form",
-            value: o,
-            ...t
-          });
-          c && l.push(c);
-        } else if (typeof o == "object") {
-          const c = J({
-            allowReserved: e,
-            explode: !0,
-            name: n,
-            style: "deepObject",
-            value: o,
-            ...r
-          });
-          c && l.push(c);
-        } else {
-          const c = T({
-            allowReserved: e,
-            name: n,
-            value: o
-          });
-          c && l.push(c);
-        }
+}, G = ({
+  parameters: e = {},
+  ...t
+} = {}) => (s) => {
+  const i = [];
+  if (s && typeof s == "object")
+    for (const l in s) {
+      const a = s[l];
+      if (a == null)
+        continue;
+      const o = e[l] || t;
+      if (Array.isArray(a)) {
+        const n = J({
+          allowReserved: o.allowReserved,
+          explode: !0,
+          name: l,
+          style: "form",
+          value: a,
+          ...o.array
+        });
+        n && i.push(n);
+      } else if (typeof a == "object") {
+        const n = M({
+          allowReserved: o.allowReserved,
+          explode: !0,
+          name: l,
+          style: "deepObject",
+          value: a,
+          ...o.object
+        });
+        n && i.push(n);
+      } else {
+        const n = L({
+          allowReserved: o.allowReserved,
+          name: l,
+          value: a
+        });
+        n && i.push(n);
+      }
     }
-  return l.join("&");
+  return i.join("&");
 }, be = (e) => {
   var r;
   if (!e)
@@ -344,9 +329,7 @@ const me = async (e, t) => {
       return "json";
     if (t === "multipart/form-data")
       return "formData";
-    if (["application/", "audio/", "image/", "video/"].some(
-      (s) => t.startsWith(s)
-    ))
+    if (["application/", "audio/", "image/", "video/"].some((s) => t.startsWith(s)))
       return "blob";
     if (t.startsWith("text/"))
       return "text";
@@ -378,22 +361,22 @@ const me = async (e, t) => {
         break;
     }
   }
-}, W = (e) => fe({
+}, H = (e) => pe({
   baseUrl: e.baseUrl,
   path: e.path,
   query: e.query,
-  querySerializer: typeof e.querySerializer == "function" ? e.querySerializer : M(e.querySerializer),
+  querySerializer: typeof e.querySerializer == "function" ? e.querySerializer : G(e.querySerializer),
   url: e.url
-}), H = (e, t) => {
+}), _ = (e, t) => {
   var s;
   const r = { ...e, ...t };
-  return (s = r.baseUrl) != null && s.endsWith("/") && (r.baseUrl = r.baseUrl.substring(0, r.baseUrl.length - 1)), r.headers = G(e.headers, t.headers), r;
+  return (s = r.baseUrl) != null && s.endsWith("/") && (r.baseUrl = r.baseUrl.substring(0, r.baseUrl.length - 1)), r.headers = Q(e.headers, t.headers), r;
 }, ge = (e) => {
   const t = [];
   return e.forEach((r, s) => {
     t.push([s, r]);
   }), t;
-}, G = (...e) => {
+}, Q = (...e) => {
   const t = new Headers();
   for (const r of e) {
     if (!r)
@@ -403,8 +386,8 @@ const me = async (e, t) => {
       if (l === null)
         t.delete(i);
       else if (Array.isArray(l))
-        for (const n of l)
-          t.append(i, n);
+        for (const a of l)
+          t.append(i, a);
       else l !== void 0 && t.set(
         i,
         typeof l == "object" ? JSON.stringify(l) : l
@@ -412,7 +395,7 @@ const me = async (e, t) => {
   }
   return t;
 };
-class D {
+class U {
   constructor() {
     this.fns = [];
   }
@@ -439,10 +422,10 @@ class D {
   }
 }
 const $e = () => ({
-  error: new D(),
-  request: new D(),
-  response: new D()
-}), we = M({
+  error: new U(),
+  request: new U(),
+  response: new U()
+}), we = G({
   allowReserved: !1,
   array: {
     explode: !0,
@@ -454,125 +437,135 @@ const $e = () => ({
   }
 }), xe = {
   "Content-Type": "application/json"
-}, Q = (e = {}) => ({
-  ...oe,
+}, K = (e = {}) => ({
+  ...ne,
   headers: xe,
   parseAs: "auto",
   querySerializer: we,
   ...e
 }), Se = (e = {}) => {
-  let t = H(Q(), e);
-  const r = () => ({ ...t }), s = (d) => (t = H(t, d), r()), i = $e(), l = async (d) => {
-    const a = {
+  let t = _(K(), e);
+  const r = () => ({ ...t }), s = (u) => (t = _(t, u), r()), i = $e(), l = async (u) => {
+    const c = {
       ...t,
-      ...d,
-      fetch: d.fetch ?? t.fetch ?? globalThis.fetch,
-      headers: G(t.headers, d.headers),
+      ...u,
+      fetch: u.fetch ?? t.fetch ?? globalThis.fetch,
+      headers: Q(t.headers, u.headers),
       serializedBody: void 0
     };
-    a.security && await ve({
-      ...a,
-      security: a.security
-    }), a.requestValidator && await a.requestValidator(a), a.body !== void 0 && a.bodySerializer && (a.serializedBody = a.bodySerializer(a.body)), (a.body === void 0 || a.serializedBody === "") && a.headers.delete("Content-Type");
-    const h = W(a);
-    return { opts: a, url: h };
-  }, n = async (d) => {
-    const { opts: a, url: h } = await l(d), C = {
-      redirect: "follow",
-      ...a,
-      body: pe(a)
-    };
-    let x = new Request(h, C);
-    for (const f of i.request.fns)
-      f && (x = await f(x, a));
-    const O = a.fetch;
-    let u = await O(x);
-    for (const f of i.response.fns)
-      f && (u = await f(u, x, a));
-    const p = {
-      request: x,
-      response: u
-    };
-    if (u.ok) {
-      const f = (a.parseAs === "auto" ? be(u.headers.get("Content-Type")) : a.parseAs) ?? "json";
-      if (u.status === 204 || u.headers.get("Content-Length") === "0") {
-        let $;
-        switch (f) {
+    c.security && await ve({
+      ...c,
+      security: c.security
+    }), c.requestValidator && await c.requestValidator(c), c.body !== void 0 && c.bodySerializer && (c.serializedBody = c.bodySerializer(c.body)), (c.body === void 0 || c.serializedBody === "") && c.headers.delete("Content-Type");
+    const w = c, b = H(w);
+    return { opts: w, url: b };
+  }, a = async (u) => {
+    const c = u.throwOnError ?? t.throwOnError, w = u.responseStyle ?? t.responseStyle;
+    let b, h;
+    try {
+      const { opts: d, url: f } = await l(u), g = {
+        redirect: "follow",
+        ...d,
+        body: W(d)
+      };
+      b = new Request(f, g);
+      for (const p of i.request.fns)
+        p && (b = await p(b, d));
+      const q = d.fetch;
+      h = await q(b);
+      for (const p of i.response.fns)
+        p && (h = await p(h, b, d));
+      const E = {
+        request: b,
+        response: h
+      };
+      if (h.ok) {
+        const p = (d.parseAs === "auto" ? be(h.headers.get("Content-Type")) : d.parseAs) ?? "json";
+        if (h.status === 204 || h.headers.get("Content-Length") === "0") {
+          let m;
+          switch (p) {
+            case "arrayBuffer":
+            case "blob":
+            case "text":
+              m = await h[p]();
+              break;
+            case "formData":
+              m = new FormData();
+              break;
+            case "stream":
+              m = h.body;
+              break;
+            case "json":
+            default:
+              m = {};
+              break;
+          }
+          return d.responseStyle === "data" ? m : {
+            data: m,
+            ...E
+          };
+        }
+        let x;
+        switch (p) {
           case "arrayBuffer":
           case "blob":
-          case "text":
-            $ = await u[f]();
-            break;
           case "formData":
-            $ = new FormData();
+          case "text":
+            x = await h[p]();
             break;
+          case "json": {
+            const m = await h.text();
+            x = m ? JSON.parse(m) : {};
+            break;
+          }
           case "stream":
-            $ = u.body;
-            break;
-          case "json":
-          default:
-            $ = {};
-            break;
+            return d.responseStyle === "data" ? h.body : {
+              data: h.body,
+              ...E
+            };
         }
-        return a.responseStyle === "data" ? $ : {
-          data: $,
-          ...p
+        return p === "json" && (d.responseValidator && await d.responseValidator(x), d.responseTransformer && (x = await d.responseTransformer(x))), d.responseStyle === "data" ? x : {
+          data: x,
+          ...E
         };
       }
-      let b;
-      switch (f) {
-        case "arrayBuffer":
-        case "blob":
-        case "formData":
-        case "json":
-        case "text":
-          b = await u[f]();
-          break;
-        case "stream":
-          return a.responseStyle === "data" ? u.body : {
-            data: u.body,
-            ...p
-          };
+      const O = await h.text();
+      let A;
+      try {
+        A = JSON.parse(O);
+      } catch {
       }
-      return f === "json" && (a.responseValidator && await a.responseValidator(b), a.responseTransformer && (b = await a.responseTransformer(b))), a.responseStyle === "data" ? b : {
-        data: b,
-        ...p
+      throw A ?? O;
+    } catch (d) {
+      let f = d;
+      for (const g of i.error.fns)
+        g && (f = await g(f, h, b, u));
+      if (f = f || {}, c)
+        throw f;
+      return w === "data" ? void 0 : {
+        error: f,
+        request: b,
+        response: h
       };
     }
-    const k = await u.text();
-    let q;
-    try {
-      q = JSON.parse(k);
-    } catch {
-    }
-    const j = q ?? k;
-    let g = j;
-    for (const f of i.error.fns)
-      f && (g = await f(j, u, x, a));
-    if (g = g || {}, a.throwOnError)
-      throw g;
-    return a.responseStyle === "data" ? void 0 : {
-      error: g,
-      ...p
-    };
-  }, o = (d) => (a) => n({ ...a, method: d }), c = (d) => async (a) => {
-    const { opts: h, url: C } = await l(a);
-    return ne({
-      ...h,
-      body: h.body,
-      headers: h.headers,
-      method: d,
-      onRequest: async (x, O) => {
-        let u = new Request(x, O);
-        for (const p of i.request.fns)
-          p && (u = await p(u, h));
-        return u;
+  }, o = (u) => (c) => a({ ...c, method: u }), n = (u) => async (c) => {
+    const { opts: w, url: b } = await l(c);
+    return le({
+      ...w,
+      body: w.body,
+      method: u,
+      onRequest: async (h, d) => {
+        let f = new Request(h, d);
+        for (const g of i.request.fns)
+          g && (f = await g(f, w));
+        return f;
       },
-      url: C
+      serializedBody: W(w),
+      url: b
     });
   };
   return {
-    buildUrl: W,
+    buildUrl: (u) => H({ ...t, ...u }),
     connect: o("CONNECT"),
     delete: o("DELETE"),
     get: o("GET"),
@@ -583,82 +576,67 @@ const $e = () => ({
     patch: o("PATCH"),
     post: o("POST"),
     put: o("PUT"),
-    request: n,
+    request: a,
     setConfig: s,
     sse: {
-      connect: c("CONNECT"),
-      delete: c("DELETE"),
-      get: c("GET"),
-      head: c("HEAD"),
-      options: c("OPTIONS"),
-      patch: c("PATCH"),
-      post: c("POST"),
-      put: c("PUT"),
-      trace: c("TRACE")
+      connect: n("CONNECT"),
+      delete: n("DELETE"),
+      get: n("GET"),
+      head: n("HEAD"),
+      options: n("OPTIONS"),
+      patch: n("PATCH"),
+      post: n("POST"),
+      put: n("PUT"),
+      trace: n("TRACE")
     },
     trace: o("TRACE")
   };
-}, A = Se(Q()), ze = (e) => (e.client ?? A).delete({
-  security: [
-    {
-      scheme: "bearer",
-      type: "http"
-    }
-  ],
+}, T = Se(K()), ze = (e) => (e.client ?? T).delete({
+  security: [{ scheme: "bearer", type: "http" }],
   url: "/umbraco/loglevels/api/v1/settings",
   ...e
-}), ke = (e) => ((e == null ? void 0 : e.client) ?? A).get({
-  security: [
-    {
-      scheme: "bearer",
-      type: "http"
-    }
-  ],
+}), ke = (e) => ((e == null ? void 0 : e.client) ?? T).get({
+  security: [{ scheme: "bearer", type: "http" }],
   url: "/umbraco/loglevels/api/v1/settings",
   ...e
-}), je = (e) => (e.client ?? A).put({
-  security: [
-    {
-      scheme: "bearer",
-      type: "http"
-    }
-  ],
+}), Ee = (e) => (e.client ?? T).put({
+  security: [{ scheme: "bearer", type: "http" }],
   url: "/umbraco/loglevels/api/v1/settings",
   ...e,
   headers: {
     "Content-Type": "application/json",
     ...e.headers
   }
-}), _ = [
+}), V = [
   "Verbose",
   "Debug",
   "Information",
   "Warning",
   "Error",
   "Fatal"
-], V = (e) => ({
+], F = (e) => ({
   defaultLevel: e.defaultLevel,
   overrides: e.overrides.map((t) => ({ ...t }))
-}), Ee = (e, t) => e.defaultLevel === t.defaultLevel && e.overrides.length === t.overrides.length && e.overrides.every(
+}), je = (e, t) => e.defaultLevel === t.defaultLevel && e.overrides.length === t.overrides.length && e.overrides.every(
   (r) => t.overrides.some(
     (s) => r.source === s.source && r.level === s.level
   )
-), Ce = (e, t) => {
+), Oe = (e, t) => {
   const r = e.trim();
   return r ? /\s/.test(r) ? "sourceWhitespace" : r.startsWith(".") || r.endsWith(".") || r.includes("..") ? "sourceSegments" : t.some((s) => s.source.toUpperCase() === r.toUpperCase()) ? "sourceDuplicate" : "" : "sourceRequired";
-}, qe = (e) => e === 409 ? "errorConflict" : e === 401 ? "errorUnauthorized" : e === 403 ? "errorForbidden" : e === 503 ? "errorUnavailable" : e === 400 ? "errorValidation" : "errorServer";
-var Oe = Object.defineProperty, Le = Object.getOwnPropertyDescriptor, w = (e, t, r, s) => {
-  for (var i = s > 1 ? void 0 : s ? Le(t, r) : t, l = e.length - 1, n; l >= 0; l--)
-    (n = e[l]) && (i = (s ? n(t, r, i) : n(i)) || i);
-  return s && i && Oe(t, r, i), i;
+}, Ce = (e) => e === 409 ? "errorConflict" : e === 401 ? "errorUnauthorized" : e === 403 ? "errorForbidden" : e === 503 ? "errorUnavailable" : e === 400 ? "errorValidation" : "errorServer";
+var qe = Object.defineProperty, Re = Object.getOwnPropertyDescriptor, z = (e, t, r, s) => {
+  for (var i = s > 1 ? void 0 : s ? Re(t, r) : t, l = e.length - 1, a; l >= 0; l--)
+    (a = e[l]) && (i = (s ? a(t, r, i) : a(i)) || i);
+  return s && i && qe(t, r, i), i;
 };
-let y = class extends se(ee) {
+let $ = class extends ie(te) {
   constructor() {
-    super(), this.busy = !0, this.message = "", this.error = "", this.conflict = !1, this.confirmReset = !1, this.source = "", this.sourceError = "", this.ready = !1, this.consumeContext(ie, (e) => {
+    super(), this.busy = !0, this.message = "", this.error = "", this.conflict = !1, this.confirmReset = !1, this.source = "", this.sourceError = "", this.ready = !1, this.consumeContext(ae, (e) => {
       if (!e || this.ready) return;
       this.ready = !0;
       const t = e.getOpenApiConfiguration();
-      A.setConfig({
+      T.setConfig({
         baseUrl: t.base,
         credentials: t.credentials,
         auth: t.token
@@ -669,7 +647,7 @@ let y = class extends se(ee) {
     return this.localize.term(`logLevels_${e}`, ...t);
   }
   get dirty() {
-    return !!this.data && !!this.draft && !Ee(this.data.current, this.draft);
+    return !!this.data && !!this.draft && !je(this.data.current, this.draft);
   }
   async load() {
     await this.request(async () => ke(), "refreshed");
@@ -680,10 +658,10 @@ let y = class extends se(ee) {
     try {
       const i = await e();
       if (i.error || !i.data) {
-        this.conflict = ((r = i.response) == null ? void 0 : r.status) === 409 || this.conflict, this.error = qe((s = i.response) == null ? void 0 : s.status);
+        this.conflict = ((r = i.response) == null ? void 0 : r.status) === 409 || this.conflict, this.error = Ce((s = i.response) == null ? void 0 : s.status);
         return;
       }
-      this.data = i.data, this.draft = V(i.data.current), this.conflict = !1, this.confirmReset = !1, this.message = t;
+      this.data = i.data, this.draft = F(i.data.current), this.conflict = !1, this.confirmReset = !1, this.message = t;
     } catch {
       this.error = "errorNetwork";
     } finally {
@@ -692,7 +670,7 @@ let y = class extends se(ee) {
   }
   apply() {
     !this.draft || !this.data || !this.dirty || this.busy || this.conflict || this.request(
-      () => je({
+      () => Ee({
         body: { ...this.draft, revision: this.data.revision }
       }),
       "applied"
@@ -705,7 +683,7 @@ let y = class extends se(ee) {
     );
   }
   setLevel(e, t) {
-    !this.draft || !_.includes(t) || (this.draft = e === null ? { ...this.draft, defaultLevel: t } : {
+    !this.draft || !V.includes(t) || (this.draft = e === null ? { ...this.draft, defaultLevel: t } : {
       ...this.draft,
       overrides: this.draft.overrides.map(
         (r) => r.source === e ? { ...r, level: t } : r
@@ -714,7 +692,7 @@ let y = class extends se(ee) {
   }
   async addSource(e) {
     var r, s;
-    if (e.preventDefault(), !this.draft || (this.sourceError = Ce(this.source, this.draft.overrides), this.sourceError)) return;
+    if (e.preventDefault(), !this.draft || (this.sourceError = Oe(this.source, this.draft.overrides), this.sourceError)) return;
     const t = this.source.trim();
     this.draft = {
       ...this.draft,
@@ -736,9 +714,9 @@ let y = class extends se(ee) {
     ));
   }
   select(e, t, r = !1) {
-    return m`<uui-select
+    return y`<uui-select
       label=${e === null ? this.term("defaultLevelLabel") : this.term("namespaceLevelLabel", e)}
-      .options=${_.map((s) => ({
+      .options=${V.map((s) => ({
       name: this.term(`level${s}`),
       value: s,
       selected: s === t
@@ -749,18 +727,18 @@ let y = class extends se(ee) {
     ></uui-select>`;
   }
   render() {
-    return m`<uui-box headline=${this.term("title")} aria-busy=${this.busy}>
+    return y`<uui-box headline=${this.term("title")} aria-busy=${this.busy}>
       <p>${this.term("description")}</p>
-      ${this.data ? m`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 17.0.0
-          </p>` : z}
+      ${this.data ? y`<p class="muted">
+            ${this.term("server", this.data.serverName)} · LogLevels 18.0.0
+          </p>` : j}
       <div role="status" aria-live="polite">
-        ${this.busy ? m`<uui-loader></uui-loader> ${this.data ? this.term("saving") : this.term("loading")}` : this.message ? this.term(this.message) : ""}
+        ${this.busy ? y`<uui-loader></uui-loader> ${this.data ? this.term("saving") : this.term("loading")}` : this.message ? this.term(this.message) : ""}
       </div>
-      ${this.error ? m`<div class="notice error" role="alert">
+      ${this.error ? y`<div class="notice error" role="alert">
             ${this.term(this.error)}
-          </div>` : z}
-      ${this.conflict ? m`<div class="notice">
+          </div>` : j}
+      ${this.conflict ? y`<div class="notice">
             <p>${this.term("reloadWarning")}</p>
             <uui-button
               look="secondary"
@@ -769,14 +747,14 @@ let y = class extends se(ee) {
               ?disabled=${this.busy}
               >${this.term("discardReload")}</uui-button
             >
-          </div>` : z}
-      ${!this.data && !this.busy ? m`<uui-button
+          </div>` : j}
+      ${!this.data && !this.busy ? y`<uui-button
             look="secondary"
             label=${this.term("retry")}
             @click=${this.load}
             >${this.term("retry")}</uui-button
-          >` : z}
-      ${this.draft && this.data ? m`
+          >` : j}
+      ${this.draft && this.data ? y`
             <div class="table-scroll">
               <table>
                 <caption>
@@ -811,10 +789,10 @@ let y = class extends se(ee) {
       const r = (s = this.data.current.overrides.find(
         (i) => i.source === e.source
       )) == null ? void 0 : s.level;
-      return m`<tr>
+      return y`<tr>
                       <th scope="row"><code>${e.source}</code></th>
                       <td>
-                        ${r ? this.term(`level${r}`) : m`<span class="muted"
+                        ${r ? this.term(`level${r}`) : y`<span class="muted"
                               >${this.term("newOverride")}</span
                             >`}
                       </td>
@@ -862,14 +840,14 @@ let y = class extends se(ee) {
                   >${this.term("addNamespace")}</uui-button
                 >
               </div>
-              ${this.sourceError ? m`<p class="error-text" role="alert">
+              ${this.sourceError ? y`<p class="error-text" role="alert">
                     ${this.term(this.sourceError)}
-                  </p>` : z}
+                  </p>` : j}
             </form>
             ${[
       this.draft.defaultLevel,
       ...this.draft.overrides.map((e) => e.level)
-    ].some((e) => e === "Debug" || e === "Verbose") ? m`<p class="notice">${this.term("detailedWarning")}</p>` : z}
+    ].some((e) => e === "Debug" || e === "Verbose") ? y`<p class="notice">${this.term("detailedWarning")}</p>` : j}
             <footer>
               <span
                 >${this.dirty ? this.term("unapplied") : this.term("noChanges")}</span
@@ -879,7 +857,7 @@ let y = class extends se(ee) {
                   label=${this.term("discardDraft")}
                   ?disabled=${this.busy || !this.dirty}
                   @click=${() => {
-      this.draft = V(this.data.current), this.sourceError = "", this.confirmReset = !1;
+      this.draft = F(this.data.current), this.sourceError = "", this.confirmReset = !1;
     }}
                   >${this.term("discardDraft")}</uui-button
                 >
@@ -900,7 +878,7 @@ let y = class extends se(ee) {
                 >
               </div>
             </footer>
-            ${this.confirmReset ? m`<section
+            ${this.confirmReset ? y`<section
                   class="notice"
                   aria-label=${this.term("confirmReset")}
                 >
@@ -917,14 +895,14 @@ let y = class extends se(ee) {
                       >${this.term("cancel")}</uui-button
                     >
                   </div>
-                </section>` : z}
-          ` : z}
+                </section>` : j}
+          ` : j}
     </uui-box>`;
   }
 };
-y.styles = [
-  ae,
-  te`
+$.styles = [
+  oe,
+  re`
       :host {
         display: block;
         padding: var(--uui-size-layout-1);
@@ -1037,36 +1015,36 @@ y.styles = [
       }
     `
 ];
-w([
-  S()
-], y.prototype, "data", 2);
-w([
-  S()
-], y.prototype, "draft", 2);
-w([
-  S()
-], y.prototype, "busy", 2);
-w([
-  S()
-], y.prototype, "message", 2);
-w([
-  S()
-], y.prototype, "error", 2);
-w([
-  S()
-], y.prototype, "conflict", 2);
-w([
-  S()
-], y.prototype, "confirmReset", 2);
-w([
-  S()
-], y.prototype, "source", 2);
-w([
-  S()
-], y.prototype, "sourceError", 2);
-y = w([
-  re("loglevels-workspace-view")
-], y);
+z([
+  k()
+], $.prototype, "data", 2);
+z([
+  k()
+], $.prototype, "draft", 2);
+z([
+  k()
+], $.prototype, "busy", 2);
+z([
+  k()
+], $.prototype, "message", 2);
+z([
+  k()
+], $.prototype, "error", 2);
+z([
+  k()
+], $.prototype, "conflict", 2);
+z([
+  k()
+], $.prototype, "confirmReset", 2);
+z([
+  k()
+], $.prototype, "source", 2);
+z([
+  k()
+], $.prototype, "sourceError", 2);
+$ = z([
+  se("loglevels-workspace-view")
+], $);
 export {
-  y as default
+  $ as default
 };
