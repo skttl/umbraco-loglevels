@@ -1,6 +1,6 @@
 {
   "name": "umbraco-community-loglevels",
-  "version": "19.0.0-rc1",
+  "version": "19.0.0-beta01",
   "private": true,
   "type": "module",
   "scripts": {

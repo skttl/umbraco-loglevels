@@ -163,7 +163,7 @@ export default class LogLevelsElement extends UmbElementMixin(LitElement) {
       <p>${this.term("description")}</p>
       ${this.data
         ? html`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 19.0.0-rc1
+            ${this.term("server", this.data.serverName)} · LogLevels 19.0.0-beta01
           </p>`
         : nothing}
       <div role="status" aria-live="polite">
