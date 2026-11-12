@@ -1,6 +1,6 @@
 # Umbraco.Community.LogLevels
 
-Change Serilog log levels and namespace overrides at runtime from **Settings > Log Viewer > Log levels**. The package targets Umbraco 18, with initial version **18.0.0**.
+Change Serilog log levels and namespace overrides at runtime from **Settings > Log Viewer > Log levels**. The package targets Umbraco 19 RC, with initial version **19.0.0-rc1**.
 
 For setup and runtime behavior see the [NuGet guide](docs/nuget-readme.md). The package configures itself through an `IComposer`, with no changes to standard `Program.cs`. The [Marketplace guide](umbraco-marketplace-readme.md) introduces the package to site administrators.
 
@@ -18,7 +18,7 @@ English, German, French, Dutch, Danish, Swedish, Italian and Spanish are include
 - `src/Umbraco.Community.LogLevels/Client/`: TypeScript/Lit source, generated API client and frontend build.
 - `src/Umbraco.Community.LogLevels/wwwroot/`: built assets exposed at `/App_Plugins/LogLevels/` by the Razor class library.
 - `tests/`: backend and logging integration tests.
-- `tests/Umbraco.Community.LogLevels.TestSite/`: Umbraco 18 site with the Clean starter kit and a project reference to LogLevels.
+- `tests/Umbraco.Community.LogLevels.TestSite/`: Umbraco 19 RC site with the Clean starter kit and a project reference to LogLevels.
 - `docs/nuget-readme.md`: readme packed into NuGet.
 - `umbraco-marketplace.json` and `umbraco-marketplace-readme.md`: Marketplace metadata and user guide.
 - `.github/workflows/`: build/test and trusted-publishing workflows following Unlog's layout.
@@ -27,7 +27,7 @@ There is no additional settings schema or schema-registration target: LogLevels 
 
 ## Develop locally
 
-Use the .NET 10 SDK and Node.js 24.13 or later with npm 11 or later.
+Use the .NET 11 SDK and Node.js 24.13 or later with npm 11 or later.
 
 ```sh
 cd src/Umbraco.Community.LogLevels/Client
@@ -39,7 +39,7 @@ dotnet test Umbraco.Community.LogLevels.slnx --configuration Release
 dotnet pack src/Umbraco.Community.LogLevels/Umbraco.Community.LogLevels.csproj --configuration Release --output artifacts
 ```
 
-Build the frontend before packing. Generated frontend assets are committed with source so a normal .NET build does not need Node. The client targets `@umbraco-cms/backoffice` exactly `18.0.0`; the server requires Umbraco packages in `[18.0.0,19.0.0)`.
+Build the frontend before packing. Generated frontend assets are committed with source so a normal .NET build does not need Node. The client targets `@umbraco-cms/backoffice` exactly `19.0.0-rc1`; the server requires Umbraco packages in `[19.0.0-rc1,20.0.0)`.
 
 `Client/openapi.json` is the API contract for the generated TypeScript SDK. Run `npm run generate-client` after changing the contract, then build. Keep the JSON models synchronized with the C# controller types.
 
@@ -49,17 +49,17 @@ Build the frontend before packing. Generated frontend assets are committed with 
 dotnet run --project tests/Umbraco.Community.LogLevels.TestSite
 ```
 
-The development profile installs Umbraco unattended using SQLite, so no database server or installation wizard is required. Open `http://localhost:56542/umbraco` and sign in with `admin@example.com` / `1234567890`. These public credentials are for local testing only. Clean installs its sample content during setup. Publish the Home page and save a dictionary item under Translation if the frontend is not yet visible, as described in the [Clean setup guide](https://www.nuget.org/packages/Clean/8.0.1).
+The development profile installs Umbraco unattended using SQLite, so no database server or installation wizard is required. Open `http://localhost:56542/umbraco` and sign in with `admin@example.com` / `1234567890`. These public credentials are for local testing only. Clean installs its sample content during setup. Publish the Home page and save a dictionary item under Translation if the frontend is not yet visible, as described in the [Clean setup guide](https://www.nuget.org/packages/Clean/19.0.0-beta01).
 
 Open **Settings > Log Viewer > Log levels** to try LogLevels. Rebuild the client with `npm run build` in `src/Umbraco.Community.LogLevels/Client` after frontend changes, then restart the site. Backend changes are included through the project reference.
 
-The SQLite database, media, logs and generated Clean views/assets are ignored. The 18 branch uses `Umbraco18.sqlite.db`, keeping the 17 database separate when switching branches. Clean copies its assets and components on build and imports templates and sample content on first installation. Make permanent theme changes in a separate site. This site is for local development.
+The SQLite database, media, logs and generated Clean views/assets are ignored. The 19 branch uses `Umbraco19.sqlite.db`, keeping the 17 and 18 databases separate when switching branches. Clean copies its assets and components on build and imports templates and sample content on first installation. Make permanent theme changes in a separate site. This site is for local development.
 
 ## Releases
 
-`main` targets Umbraco 18. The Umbraco 17 version is maintained on `v17/main`. Package versions must follow the corresponding Umbraco major; dependency floors remain the major's `.0.0` release.
+`main` targets Umbraco 19 RC. The Umbraco 18 version is maintained on `v18/main`, and Umbraco 17 on `v17/main`. Package versions must follow the corresponding Umbraco major; the v19 RC dependency floor is `19.0.0-rc1`, and v20 is excluded.
 
-The publish workflow on `main` accepts `v18.x.y` tags; the workflow on `v17/main` accepts `v17.x.y` tags. Each workflow builds both parts, tests, validates the NuGet identity/dependency range/assets and publishes through NuGet trusted publishing. Before publishing, create a `release` environment and its `NUGET_USER` secret, then configure a matching nuget.org trusted-publishing policy for `publish.yml`. Nothing in the local build creates the repository or publishes the package.
+The publish workflow on `main` accepts `v19.x.y` tags; the workflow on `v18/main` accepts `v18.x.y` tags, and `v17/main` accepts `v17.x.y` tags. Each workflow builds both parts, tests, validates the NuGet identity/dependency range/assets and publishes through NuGet trusted publishing. Before publishing, create a `release` environment and its `NUGET_USER` secret, then configure a matching nuget.org trusted-publishing policy for `publish.yml`. Nothing in the local build creates the repository or publishes the package.
 
 ## License and icon
 

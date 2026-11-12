@@ -1,6 +1,6 @@
 import { LitElement as te, html as y, nothing as j, css as re, state as k, customElement as se } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin as ie } from "@umbraco-cms/backoffice/element-api";
-import { UMB_AUTH_CONTEXT as ae } from "@umbraco-cms/backoffice/auth";
+import { UMB_SERVER_CONTEXT as ae } from "@umbraco-cms/backoffice/server";
 import { UmbTextStyles as oe } from "@umbraco-cms/backoffice/style";
 const ne = {
   bodySerializer: (e) => JSON.stringify(e, (t, r) => typeof r == "bigint" ? r.toString() : r)
@@ -337,31 +337,30 @@ const me = async (e, t) => {
 }, ye = (e, t) => {
   var r, s;
   return t ? !!(e.headers.has(t) || (r = e.query) != null && r[t] || (s = e.headers.get("Cookie")) != null && s.includes(`${t}=`)) : !1;
-}, ve = async ({
-  security: e,
-  ...t
-}) => {
-  for (const r of e) {
-    if (ye(t, r.name))
+};
+async function ve(e) {
+  for (const t of e.security ?? []) {
+    if (ye(e, t.name))
       continue;
-    const s = await me(r, t.auth);
-    if (!s)
+    const r = await me(t, e.auth);
+    if (!r)
       continue;
-    const i = r.name ?? "Authorization";
-    switch (r.in) {
+    const s = t.name ?? "Authorization";
+    switch (t.in) {
       case "query":
-        t.query || (t.query = {}), t.query[i] = s;
+        e.query || (e.query = {}), e.query[s] = r;
         break;
       case "cookie":
-        t.headers.append("Cookie", `${i}=${s}`);
+        e.headers.append("Cookie", `${s}=${r}`);
         break;
       case "header":
       default:
-        t.headers.set(i, s);
+        e.headers.set(s, r);
         break;
     }
   }
-}, H = (e) => pe({
+}
+const H = (e) => pe({
   baseUrl: e.baseUrl,
   path: e.path,
   query: e.query,
@@ -395,7 +394,7 @@ const me = async (e, t) => {
   }
   return t;
 };
-class U {
+class A {
   constructor() {
     this.fns = [];
   }
@@ -422,9 +421,9 @@ class U {
   }
 }
 const $e = () => ({
-  error: new U(),
-  request: new U(),
-  response: new U()
+  error: new A(),
+  request: new A(),
+  response: new A()
 }), we = G({
   allowReserved: !1,
   array: {
@@ -453,10 +452,7 @@ const $e = () => ({
       headers: Q(t.headers, u.headers),
       serializedBody: void 0
     };
-    c.security && await ve({
-      ...c,
-      security: c.security
-    }), c.requestValidator && await c.requestValidator(c), c.body !== void 0 && c.bodySerializer && (c.serializedBody = c.bodySerializer(c.body)), (c.body === void 0 || c.serializedBody === "") && c.headers.delete("Content-Type");
+    c.security && await ve(c), c.requestValidator && await c.requestValidator(c), c.body !== void 0 && c.bodySerializer && (c.serializedBody = c.bodySerializer(c.body)), (c.body === void 0 || c.serializedBody === "") && c.headers.delete("Content-Type");
     const w = c, b = H(w);
     return { opts: w, url: b };
   }, a = async (u) => {
@@ -530,12 +526,12 @@ const $e = () => ({
         };
       }
       const O = await h.text();
-      let A;
+      let U;
       try {
-        A = JSON.parse(O);
+        U = JSON.parse(O);
       } catch {
       }
-      throw A ?? O;
+      throw U ?? O;
     } catch (d) {
       let f = d;
       for (const g of i.error.fns)
@@ -591,7 +587,7 @@ const $e = () => ({
     },
     trace: o("TRACE")
   };
-}, T = Se(K()), ze = (e) => (e.client ?? T).delete({
+}, T = Se(K({ baseUrl: "openapi.json" })), ze = (e) => (e.client ?? T).delete({
   security: [{ scheme: "bearer", type: "http" }],
   url: "/umbraco/loglevels/api/v1/settings",
   ...e
@@ -633,14 +629,10 @@ var qe = Object.defineProperty, Re = Object.getOwnPropertyDescriptor, z = (e, t,
 let $ = class extends ie(te) {
   constructor() {
     super(), this.busy = !0, this.message = "", this.error = "", this.conflict = !1, this.confirmReset = !1, this.source = "", this.sourceError = "", this.ready = !1, this.consumeContext(ae, (e) => {
-      if (!e || this.ready) return;
-      this.ready = !0;
-      const t = e.getOpenApiConfiguration();
-      T.setConfig({
-        baseUrl: t.base,
-        credentials: t.credentials,
-        auth: t.token
-      }), this.load();
+      !e || this.ready || (this.ready = !0, T.setConfig({
+        baseUrl: e.getServerUrl(),
+        credentials: "include"
+      }), this.load());
     });
   }
   term(e, ...t) {
@@ -730,7 +722,7 @@ let $ = class extends ie(te) {
     return y`<uui-box headline=${this.term("title")} aria-busy=${this.busy}>
       <p>${this.term("description")}</p>
       ${this.data ? y`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 18.0.0
+            ${this.term("server", this.data.serverName)} · LogLevels 19.0.0-rc1
           </p>` : j}
       <div role="status" aria-live="polite">
         ${this.busy ? y`<uui-loader></uui-loader> ${this.data ? this.term("saving") : this.term("loading")}` : this.message ? this.term(this.message) : ""}

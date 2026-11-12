@@ -7,7 +7,7 @@ import {
   nothing,
 } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
-import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
+import { UMB_SERVER_CONTEXT } from "@umbraco-cms/backoffice/server";
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { client } from "./api/client.gen.js";
 import { getSettings, updateSettings, resetSettings } from "./api/sdk.gen.js";
@@ -37,14 +37,12 @@ export default class LogLevelsElement extends UmbElementMixin(LitElement) {
   }
   constructor() {
     super();
-    this.consumeContext(UMB_AUTH_CONTEXT, (auth) => {
-      if (!auth || this.ready) return;
+    this.consumeContext(UMB_SERVER_CONTEXT, (server) => {
+      if (!server || this.ready) return;
       this.ready = true;
-      const config = auth.getOpenApiConfiguration();
       client.setConfig({
-        baseUrl: config.base,
-        credentials: config.credentials,
-        auth: config.token,
+        baseUrl: server.getServerUrl(),
+        credentials: "include",
       });
       void this.load();
     });
@@ -165,7 +163,7 @@ export default class LogLevelsElement extends UmbElementMixin(LitElement) {
       <p>${this.term("description")}</p>
       ${this.data
         ? html`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 18.0.0
+            ${this.term("server", this.data.serverName)} · LogLevels 19.0.0-rc1
           </p>`
         : nothing}
       <div role="status" aria-live="polite">
