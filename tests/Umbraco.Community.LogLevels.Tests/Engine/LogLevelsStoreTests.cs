@@ -185,6 +185,25 @@ public sealed class LogLevelsStoreTests
         Assert.Empty(store.GetSettings().Current.Overrides);
     }
 
+    [Theory]
+    [InlineData("Unset", null)]
+    [InlineData("Empty", "")]
+    [InlineData("Nested:Child", "Verbose")]
+    public void StartupIgnoresOverridesWithoutAScalarLevel(string key, string? value)
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Serilog:MinimumLevel:Default"] = "Warning",
+            ["Serilog:MinimumLevel:Override:Active"] = "Debug",
+            [$"Serilog:MinimumLevel:Override:{key}"] = value
+        }).Build();
+
+        var startup = new LogLevelsStore(configuration).GetSettings().Startup;
+
+        Assert.Equal("Warning", startup.DefaultLevel);
+        Assert.Equal(new LogLevelOverride("Active", "Debug"), Assert.Single(startup.Overrides));
+    }
+
     [Fact]
     public void NamespaceMatchingIsCaseInsensitiveAndDuplicateCaseVariantsAreRejected()
     {
