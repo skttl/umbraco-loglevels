@@ -19,6 +19,7 @@ public sealed class LogLevelsStore : ILogEventFilter
         var section = configuration.GetSection("Serilog:MinimumLevel");
         var defaultLevel = section["ControlledBy"] ?? GetDefaultLevel(configuration, section) ?? "Information";
         var overrides = section.GetSection("Override").GetChildren()
+            .Where(child => !string.IsNullOrEmpty(child.Value))
             .Select(child => new LogLevelOverride(child.Key, ResolveLevel(configuration, child.Value))).ToArray();
         _startup = CreateSnapshot(ResolveLevel(configuration, defaultLevel), overrides, 0);
         _current = _startup;
