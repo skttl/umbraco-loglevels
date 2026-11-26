@@ -1,6 +1,6 @@
 # Umbraco.Community.LogLevels
 
-Change Serilog log levels and namespace overrides at runtime from **Settings > Log Viewer > Log levels**. The package targets Umbraco 18, with initial version **18.0.0**.
+Change Serilog log levels and namespace overrides at runtime from **Settings > Log Viewer > Log levels**. The package targets Umbraco 18, with package version **18.0.1**.
 
 For setup and runtime behavior see the [NuGet guide](docs/nuget-readme.md). The package configures itself through an `IComposer`, with no changes to standard `Program.cs`. The [Marketplace guide](umbraco-marketplace-readme.md) introduces the package to site administrators.
 

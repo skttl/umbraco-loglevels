@@ -730,7 +730,7 @@ let $ = class extends ie(te) {
     return y`<uui-box headline=${this.term("title")} aria-busy=${this.busy}>
       <p>${this.term("description")}</p>
       ${this.data ? y`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 18.0.0
+            ${this.term("server", this.data.serverName)} · LogLevels 18.0.1
           </p>` : j}
       <div role="status" aria-live="polite">
         ${this.busy ? y`<uui-loader></uui-loader> ${this.data ? this.term("saving") : this.term("loading")}` : this.message ? this.term(this.message) : ""}
