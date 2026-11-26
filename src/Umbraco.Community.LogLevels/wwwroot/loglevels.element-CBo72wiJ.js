@@ -752,7 +752,7 @@ let y = class extends se(ee) {
     return m`<uui-box headline=${this.term("title")} aria-busy=${this.busy}>
       <p>${this.term("description")}</p>
       ${this.data ? m`<p class="muted">
-            ${this.term("server", this.data.serverName)} · LogLevels 17.0.0
+            ${this.term("server", this.data.serverName)} · LogLevels 17.0.1
           </p>` : z}
       <div role="status" aria-live="polite">
         ${this.busy ? m`<uui-loader></uui-loader> ${this.data ? this.term("saving") : this.term("loading")}` : this.message ? this.term(this.message) : ""}

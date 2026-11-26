@@ -7,7 +7,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>App_Plugins/LogLevels</StaticWebAssetBasePath>
     <PackageId>Umbraco.Community.LogLevels</PackageId>
-    <Version>17.0.0</Version>
+    <Version>17.0.1</Version>
     <Authors>skttl</Authors>
     <Description>Change Serilog log levels and namespace overrides at runtime from the Umbraco Log Viewer.</Description>
     <PackageTags>umbraco;umbraco-marketplace;serilog;logging;loglevels</PackageTags>
